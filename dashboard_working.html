@@ -1,0 +1,112 @@
+ <div class="dashboard-title w-100 mt-3 mx-0 border-bottom border-2 py-2 px-xl-4 bg-light">
+      <h2 class="fw-bold mx-xl-5">Prepare</h2>
+    </div>
+    
+
+    <div class="dashboard row justify-content-center" id="dashboard-main" >
+      <div class="col-xl-11 mt-5">
+          % if display_dashboard_courses:
+
+            <div class="row">
+              <div class="col-md-12">
+                % if (hasattr(settings,'HIDE_ENROLL_BUTTON') and not settings.HIDE_ENROLL_BUTTON):  
+                  <div style="float: right;">
+                    <div class="addAID">
+                      <span class="enrollemnt-button btn btn-info" title="Enroll into program and course using the Enrollment ID">
+                        <i class="fa fa-plus" style="font-size:16px"></i>
+                        &nbsp; Enroll
+                      </span>
+                      <!-- <span class="enrollment-text-label">Have an enrolment id?</span> -->
+                    </div>
+                    <!-- <a href="#" class="addAID" style="cursor:pointer;text-decoration: none;">Click here</a> for enrollment -->
+                  </div>
+                % endif
+                
+              </div>
+            </div>
+            <!-- Courses -->
+            <%include file='dashboard/_dashboard_row.html' args='course_entitlements=course_entitlements, course_enrollments=course_enrollments, 
+            courseKeys=course_key_list, listID ="couserlists2", listTitle="My Courses", NA_Message ="No Course details available", entityName="course", ENABLE_CARD_VIEW=ENABLE_CARD_VIEW' />
+
+            <!-- Assessments -->
+            <%include file='dashboard/_dashboard_row.html' args='course_entitlements=course_entitlements, course_enrollments=course_enrollments, 
+            courseKeys=assessment_key_list, listID ="couserlists1", listTitle="My Assessments", NA_Message ="No Assessment details available", entityName="assessment", ENABLE_CARD_VIEW=ENABLE_CARD_VIEW' />
+          % else:
+            <div class="empty-dashboard-message">
+              % if display_dashboard_courses:
+                <p>${_("You are not enrolled in any courses yet.")}</p>
+                % if empty_dashboard_message:
+                  <p class="custom-message">${empty_dashboard_message | n, decode.utf8}</p>
+                %endif
+                % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+                  <a class="btn btn-primary" href="${marketing_link('COURSES')}">
+                    ${_("Explore courses")}
+                  </a>
+                %endif
+              % else:
+              <p>${_("Activate your account!")}</p>
+              <p class="custom-message">${ activate_account_message | n, decode.utf8 }</p>
+              % endif
+          </div>
+          % endif
+
+          % if staff_access and len(errored_courses) > 0:
+            <div id="course-errors">
+              <h2>${_("Course-loading errors")}</h2>
+
+            % for course_dir, errors in errored_courses.items():
+               <h3>${course_dir}</h3>
+                   <ul>
+                 % for (msg, err) in errors:
+                     <li>${msg}
+                       <ul><li><pre>${err}</pre></li></ul>
+                     </li>
+                 % endfor
+                   </ul>
+            % endfor
+            </div>
+          % endif
+        </div>
+
+        
+          
+        </div>
+      </div>
+      <div class="side-container" role="complementary" aria-label="messages">
+        %if display_sidebar_account_activation_message:
+          <div class="sidebar-notification">
+            <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
+          </div>
+        %endif
+
+        % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+          <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
+            <form class="search-form">
+              <label for="dashboard-search-input">${_('Search Your Courses')}</label>
+              <div class="search-field-wrapper">
+                <input id="dashboard-search-input" type="text" class="search-field"/>
+                <button type="submit" class="search-button" title="${_('Search')}">
+                  <span class="icon fa fa-search" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="cancel-button" title="${_('Clear search')}">
+                  <span class="icon fa fa-remove" aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+          <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
+        % endif
+
+        
+
+        <%block name="skip_links">
+          % if settings.FEATURES.get('ENABLE_ANNOUNCEMENTS'):
+            <a id="announcements-skip" class="nav-skip sr-only sr-only-focusable" href="#announcements">${_("Skip to list of announcements")}</a>
+          % endif
+        </%block>
+        % if settings.FEATURES.get('ENABLE_ANNOUNCEMENTS'):
+          <%include file='dashboard/_dashboard_announcements.html' />
+        % endif
+
+      </div>
+    </div>
